@@ -87,24 +87,9 @@ impl Game {
         self.paddle.update(dt);
         self.ball.update(dt);
 
-        // paddle-ball intersection
         let ball_rect = self.ball.get_rect();
         let paddle_rect = self.paddle.get_rect();
 
-        if ball_rect.intersects(paddle_rect) {
-            let bcenter = ball_rect.x + ball_rect.width / 2.0;
-            let pcenter = paddle_rect.x + paddle_rect.width / 2.0;
-
-            let speed = self.ball.get_velocity();
-            let speed_xy = (speed.x*speed.x + speed.y * speed.y).sqrt();
-            let pos_x = (bcenter - pcenter) / (paddle_rect.width / 2.0);
-            let influence = 0.75;
-            let speed_x = speed_xy * pos_x * influence;
-            let speed_y = (speed_xy*speed_xy - speed_x * speed_x).sqrt() * if speed.y > 0.0 { -1.0 } else { 1.0 };
-            self.ball.set_velocity(Vec2::new(speed_x, speed_y));
-        }
-
-        // ball-border intersection 
         let left_border_rect = Rect::new(0.0, 0.0, 
             self.settings.border_thickness, self.settings.board_size.y);
         let right_border_rect = Rect::new(
@@ -113,38 +98,36 @@ impl Game {
         let top_border_rect = Rect::new(
             0.0, 0.0, self.settings.board_size.x, self.settings.border_thickness);
 
-        if ball_rect.intersects(left_border_rect) {
-            let mut bvelocity = self.ball.get_velocity();
-            bvelocity.x *= -1.0;
-            self.ball.set_velocity(bvelocity);
-        }
-        if ball_rect.intersects(right_border_rect) {
-            let mut bvelocity = self.ball.get_velocity();
-            bvelocity.x *= -1.0;
-            self.ball.set_velocity(bvelocity);
-        }
-        if ball_rect.intersects(top_border_rect) {
-            let mut bvelocity = self.ball.get_velocity();
-            bvelocity.y *= -1.0;
-            self.ball.set_velocity(bvelocity);
-        }
+        let borders = [left_border_rect, right_border_rect]; 
+        let mut new_velocity = self.ball.get_velocity();
 
-        // ball-brick intersection
-        let mut to_delete = Vec::new();
-        for (i, brick) in self.bricks.iter().enumerate() {
-            let brick_rect = brick.get_rect();
-            if ball_rect.intersects(brick_rect) {
-                to_delete.push(i);
-                let mut bvelocity = self.ball.get_velocity();
-                bvelocity.y *= -1.0;
-                self.ball.set_velocity(bvelocity);
-            }
-        }
+        // paddle-ball intersection
+        if ball_rect.intersects(paddle_rect) {
+            let bcenter = ball_rect.x + ball_rect.width / 2.0;
+            let pcenter = paddle_rect.x + paddle_rect.width / 2.0;
 
-        // remove bricks the ball collided with
-        for idx in to_delete {
-            self.bricks.remove(idx);
+            let speed = self.ball.get_velocity();
+            let speed_xy = (speed.x*speed.x + speed.y * speed.y).sqrt();
+            let pos_x = (bcenter - pcenter) / (paddle_rect.width / 2.0);
+            let influence = 0.75;
+            new_velocity.x = speed_xy * pos_x * influence;
+            new_velocity.y = (speed_xy*speed_xy - new_velocity.x * new_velocity.x).sqrt() * if speed.y > 0.0 { -1.0 } else { 1.0 };
         }
+        // ball-left-right-border intersection
+        else if borders.iter().any(|border| ball_rect.intersects(border.clone())) {
+            new_velocity.x *= -1.0;
+        }
+        // ball-top-border intersection
+        else if ball_rect.intersects(top_border_rect) {
+            new_velocity.y *= -1.0;
+        }
+        // ball-bricks intersection
+        else if self.bricks.iter().any(|brick| ball_rect.intersects(brick.get_rect())) {
+            new_velocity.y *= -1.0;
+            self.bricks.retain(|brick| !ball_rect.intersects(brick.get_rect()));
+        }
+        
+        self.ball.set_velocity(new_velocity);
     }
 
     pub fn key_pressed(&mut self, key: Key) {
