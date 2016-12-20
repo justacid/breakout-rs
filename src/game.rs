@@ -1,10 +1,9 @@
 use piston_window::{Context, G2d, Key, clear, rectangle};
-use na::{Vector2, Vector3};
+use na::Vector2;
 use objects::*;
 use rect::Rect;
 
 pub type Vec2 = Vector2<f64>;
-pub type Vec3 = Vector3<f64>;
 
 #[derive(Copy, Clone)]
 pub enum GameColor {
