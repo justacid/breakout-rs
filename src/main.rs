@@ -2,18 +2,12 @@ extern crate piston;
 extern crate piston_window;
 extern crate nalgebra as na;
 
-mod gamesettings;
 mod game;
-mod paddle;
-mod ball;
-mod brick;
+mod objects;
 mod rect;
 
-use piston_window::*;
-use na::{Vector2, Vector3};
-
-pub type Vec2 = Vector2<f64>;
-pub type Vec3 = Vector3<f64>;
+use piston_window::{PistonWindow, WindowSettings, Event, Button, Input};
+use game::{Vec2, Game, GameSettings, GameColor};
 
 fn main() {
     let mut window: PistonWindow = 
@@ -23,8 +17,20 @@ fn main() {
         .build()
         .unwrap();
 
-    let game_settings = gamesettings::GameSettings::new(Vec2::new(480.0, 800.0));
-    let mut game = game::Game::new(game_settings);
+    let game_settings = GameSettings {
+        board_size: Vec2::new(480.0, 800.0),
+        ball_size: Vec2::new(5.0, 5.0),
+        paddle_size: Vec2::new(75.0, 10.0),
+        paddle_color: GameColor::Red,
+        ball_color: GameColor::White,
+        border_color: GameColor::Cyan,
+        brick_color: GameColor::Yellow,
+        border_thickness: 5.0,
+        brick_rows: 8,
+        brick_cols: 7
+    };
+
+    let mut game = Game::new(game_settings);
         
     while let Some(e) = window.next() {
         match e {
