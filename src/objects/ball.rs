@@ -10,10 +10,10 @@ pub struct Ball {
 
 impl Ball {
     pub fn new(bounds: Rect, color: GameColor, velocity: Vec2) -> Ball {
-        Ball { 
+        Ball {
             bounds: bounds,
-            color: color, 
-            velocity: velocity 
+            color: color,
+            velocity: velocity,
         }
     }
 

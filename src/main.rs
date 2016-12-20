@@ -10,8 +10,7 @@ use piston_window::{PistonWindow, WindowSettings, Event, Button, Input};
 use game::{Vec2, Game, GameSettings, GameColor};
 
 fn main() {
-    let mut window: PistonWindow = 
-        WindowSettings::new("Breakout-Rs!", [480, 800])
+    let mut window: PistonWindow = WindowSettings::new("Breakout-Rs!", [480, 800])
         .exit_on_esc(true)
         .resizable(false)
         .build()
@@ -27,11 +26,11 @@ fn main() {
         brick_color: GameColor::Yellow,
         border_thickness: 5.0,
         brick_rows: 8,
-        brick_cols: 7
+        brick_cols: 7,
     };
 
     let mut game = Game::new(game_settings);
-        
+
     while let Some(e) = window.next() {
         match e {
             Event::Input(Input::Press(Button::Keyboard(key))) => {
@@ -48,7 +47,7 @@ fn main() {
                 });
             }
 
-            Event::Update(args) => { 
+            Event::Update(args) => {
                 game.update(args.dt);
             }
 

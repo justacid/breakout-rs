@@ -5,7 +5,7 @@ use rect::Rect;
 #[derive(Copy, Clone)]
 pub struct PaddleInput {
     pub left_pressed: bool,
-    pub right_pressed: bool
+    pub right_pressed: bool,
 }
 
 pub struct Paddle {
@@ -18,10 +18,10 @@ pub struct Paddle {
 impl Paddle {
     pub fn new(bounds: Rect, color: GameColor, board_size: Vec2, speed: f64) -> Paddle {
         Paddle {
-            bounds: bounds, 
-            color: color, 
-            board_size: board_size, 
-            speed: speed, 
+            bounds: bounds,
+            color: color,
+            board_size: board_size,
+            speed: speed,
         }
     }
 

@@ -11,7 +11,7 @@ pub enum GameColor {
     Red,
     Yellow,
     Cyan,
-    White
+    White,
 }
 
 impl Into<[f32; 4]> for GameColor {
@@ -20,7 +20,7 @@ impl Into<[f32; 4]> for GameColor {
             GameColor::Red => [1.0, 0.0, 0.0, 1.0],
             GameColor::Yellow => [1.0, 1.0, 0.0, 1.0],
             GameColor::Cyan => [0.0, 1.0, 1.0, 1.0],
-            GameColor::White => [1.0, 1.0, 1.0, 1.0]
+            GameColor::White => [1.0, 1.0, 1.0, 1.0],
         }
     }
 }
@@ -36,7 +36,7 @@ pub struct GameSettings {
     pub brick_color: GameColor,
     pub border_thickness: f64,
     pub brick_rows: u32,
-    pub brick_cols: u32
+    pub brick_cols: u32,
 }
 
 pub struct Game {
@@ -48,37 +48,43 @@ pub struct Game {
     paused: bool,
     left_border: Rect,
     top_border: Rect,
-    right_border: Rect
+    right_border: Rect,
 }
 
 impl Game {
     pub fn new(settings: GameSettings) -> Game {
         let left = Rect {
-            x: 0.0, y: 0.0,
-            width: settings.border_thickness, 
-            height: settings.board_size.y
+            x: 0.0,
+            y: 0.0,
+            width: settings.border_thickness,
+            height: settings.board_size.y,
         };
         let top = Rect {
-            x: 0.0, y: 0.0,
+            x: 0.0,
+            y: 0.0,
             width: settings.board_size.x,
-            height: settings.border_thickness
+            height: settings.border_thickness,
         };
-        let right = Rect { 
+        let right = Rect {
             x: settings.board_size.x - settings.border_thickness,
-            y: 0.0, width: settings.border_thickness,
-            height: settings.board_size.y
+            y: 0.0,
+            width: settings.border_thickness,
+            height: settings.board_size.y,
         };
-        
-        Game { 
+
+        Game {
             paddle: Game::reset_paddle(&settings),
             ball: Game::reset_ball(&settings),
             bricks: Game::reset_bricks(&settings),
             paused: true,
-            pinput: PaddleInput { left_pressed: false, right_pressed: false },
+            pinput: PaddleInput {
+                left_pressed: false,
+                right_pressed: false,
+            },
             settings: settings,
             left_border: left,
             top_border: top,
-            right_border: right
+            right_border: right,
         }
     }
 
@@ -86,11 +92,9 @@ impl Game {
         let paddle_y = settings.board_size.y - 30.0;
         let ball_x = settings.board_size.x / 2.0 - settings.ball_size.x / 2.0;
         let position = Vec2::new(ball_x, paddle_y - 50.0);
-        Ball::new(
-            Rect::from_extents(position, settings.ball_size),
-            settings.ball_color,
-            Vec2::new(0.0, 225.0)
-        )
+        Ball::new(Rect::from_extents(position, settings.ball_size),
+                  settings.ball_color,
+                  Vec2::new(0.0, 225.0))
     }
 
     fn reset_paddle(settings: &GameSettings) -> Paddle {
@@ -98,22 +102,21 @@ impl Game {
         let paddle_y = settings.board_size.y - 30.0;
         let position = Vec2::new(paddle_x, paddle_y);
 
-        Paddle::new(
-            Rect::from_extents(position, settings.paddle_size),
-            settings.paddle_color,
-            settings.board_size,
-            200.0
-        )
+        Paddle::new(Rect::from_extents(position, settings.paddle_size),
+                    settings.paddle_color,
+                    settings.board_size,
+                    200.0)
     }
 
     fn reset_bricks(settings: &GameSettings) -> Vec<Brick> {
         let mut bricks = Vec::new();
         for y in 0..settings.brick_rows {
             for x in 0..settings.brick_cols {
-                bricks.push(Brick::new(
-                    Rect::new(50.0 + x as f64 * 55.0, 100.0 + y as f64 * 15.0, 50.0, 10.0),
-                    GameColor::Yellow)
-                );
+                bricks.push(Brick::new(Rect::new(50.0 + x as f64 * 55.0,
+                                                 100.0 + y as f64 * 15.0,
+                                                 50.0,
+                                                 10.0),
+                                       GameColor::Yellow));
             }
         }
         bricks
@@ -123,10 +126,19 @@ impl Game {
         clear([0.0, 0.0, 0.0, 1.0], g);
 
         // render borders
-        rectangle(GameColor::Cyan.into(), self.left_border.to_array(), c.transform, g);
-        rectangle(GameColor::Cyan.into(), self.top_border.to_array(), c.transform, g);
-        rectangle(GameColor::Cyan.into(), self.right_border.to_array(), c.transform, g);
-        
+        rectangle(GameColor::Cyan.into(),
+                  self.left_border.to_array(),
+                  c.transform,
+                  g);
+        rectangle(GameColor::Cyan.into(),
+                  self.top_border.to_array(),
+                  c.transform,
+                  g);
+        rectangle(GameColor::Cyan.into(),
+                  self.right_border.to_array(),
+                  c.transform,
+                  g);
+
         self.paddle.render(c, g);
         self.ball.render(c, g);
 
@@ -149,7 +161,9 @@ impl Game {
         }
 
         // dont update ball or check collisions if game is paused
-        if self.paused { return; }
+        if self.paused {
+            return;
+        }
 
         self.ball.update(dt);
 
@@ -163,14 +177,16 @@ impl Game {
             let pcenter = paddle_rect.x + paddle_rect.width / 2.0;
 
             let speed = self.ball.get_velocity();
-            let speed_xy = (speed.x*speed.x + speed.y * speed.y).sqrt();
+            let speed_xy = (speed.x * speed.x + speed.y * speed.y).sqrt();
             let pos_x = (bcenter - pcenter) / (paddle_rect.width / 2.0);
             let influence = 0.75;
             new_velocity.x = speed_xy * pos_x * influence;
-            new_velocity.y = (speed_xy*speed_xy - new_velocity.x * new_velocity.x).sqrt() * if speed.y > 0.0 { -1.0 } else { 1.0 };
+            new_velocity.y = (speed_xy * speed_xy - new_velocity.x * new_velocity.x).sqrt() *
+                             if speed.y > 0.0 { -1.0 } else { 1.0 };
         }
         // ball-left-right-border intersection
-        else if ball_rect.intersects(&self.left_border) || ball_rect.intersects(&self.right_border) {
+        else if ball_rect.intersects(&self.left_border) ||
+                  ball_rect.intersects(&self.right_border) {
             new_velocity.x *= -1.0;
         }
         // ball-top-border intersection
@@ -182,7 +198,7 @@ impl Game {
             new_velocity.y *= -1.0;
             self.bricks.retain(|brick| !ball_rect.intersects(&brick.get_bounds()));
         }
-        
+
         self.ball.set_velocity(new_velocity);
     }
 
