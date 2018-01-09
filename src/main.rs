@@ -1,16 +1,21 @@
 extern crate piston;
 extern crate piston_window;
+extern crate glfw_window;
 extern crate nalgebra as na;
 
 mod game;
 mod objects;
 mod rect;
 
-use piston_window::{PistonWindow, WindowSettings, Event, Button, Input};
+use piston::window::WindowSettings;
+use piston::event_loop::*;
+use piston::input::*;
+use piston_window::PistonWindow;
+use glfw_window::GlfwWindow;
 use game::{Vec2, Game, GameSettings, GameColor};
 
 fn main() {
-    let mut window: PistonWindow = WindowSettings::new("Breakout-Rs!", [480, 800])
+    let mut window: PistonWindow<GlfwWindow> = WindowSettings::new("Breakout-Rs!", [480, 800])
         .exit_on_esc(true)
         .resizable(false)
         .build()
@@ -30,28 +35,25 @@ fn main() {
     };
 
     let mut game = Game::new(game_settings);
+    let mut events = Events::new(EventSettings::new());
 
-    while let Some(e) = window.next() {
-        match e {
-            Event::Input(Input::Press(Button::Keyboard(key))) => {
+    while let Some(e) = events.next(&mut window) {
+            if let Some(Button::Keyboard(key)) = e.press_args() {
                 game.key_pressed(key);
-            }
+            };
 
-            Event::Input(Input::Release(Button::Keyboard(key))) => {
+            if let Some(Button::Keyboard(key)) = e.release_args() {
                 game.key_released(key);
-            }
+            };
 
-            Event::Render(_) => {
+            if let Some(_) = e.render_args() {
                 window.draw_2d(&e, |c, g| {
                     game.render(c, g);
                 });
-            }
+            };
 
-            Event::Update(args) => {
+            if let Some(args) = e.update_args() {
                 game.update(args.dt);
-            }
-
-            _ => {}
-        }
+            };
     }
 }

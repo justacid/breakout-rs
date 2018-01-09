@@ -4,6 +4,8 @@ version = "0.1.0"
 authors = ["Tobias Schwackenhofer <tobiasschw@gmail.com>"]
 
 [dependencies]
-piston = "0.27.0"
-piston_window = "0.59.0"
-nalgebra = "0.10.1"
+piston = "0.35.0"
+piston2d-graphics = "0.24.0"
+piston_window = "0.74.0"
+pistoncore-glfw_window = "0.39.0"
+nalgebra = "0.13.1"
