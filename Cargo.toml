@@ -1,11 +1,11 @@
 [package]
 name = "breakout-rs"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Tobias Schwackenhofer <tobiasschw@gmail.com>"]
 
 [dependencies]
-piston = "0.35.0"
-piston2d-graphics = "0.24.0"
-piston_window = "0.74.0"
-pistoncore-glfw_window = "0.39.0"
-nalgebra = "0.20.0"
+piston = "0.53.1"
+piston2d-graphics = "0.42.0"
+piston_window = "0.123.0"
+pistoncore-glfw_window = "0.75.0"
+nalgebra = "0.31.0"

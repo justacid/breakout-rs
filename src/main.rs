@@ -47,7 +47,7 @@ fn main() {
             };
 
             if let Some(_) = e.render_args() {
-                window.draw_2d(&e, |c, g| {
+                window.draw_2d(&e, |c, g, _| {
                     game.render(c, g);
                 });
             };
